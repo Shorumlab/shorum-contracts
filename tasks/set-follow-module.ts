@@ -12,7 +12,7 @@ task('set-follow-module', 'set a follow module for a profile').setAction(async (
   const currencyAddr = '0xfe4F5145f6e09952a5ba9e956ED0C25e3Fa4c7F1';
   const profileId = 1;
   const amountToBePaid = 1e17;
-  const moduleAddr = addrs('backer follow module');
+  const moduleAddr = addrs['backer follow module'];
   const dataStructure = ['uint256', 'address', 'address'];
 
   let governanceNonce = await hre.ethers.provider.getTransactionCount(governance.address);
