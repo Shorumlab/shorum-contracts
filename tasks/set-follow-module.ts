@@ -14,6 +14,7 @@ task('create-profile', 'creates a profile').setAction(async ({}, hre) => {
   const profileId = 1;
   const amountToBePaid = 1e17;
   const moduleAddr = addrs('backer follow module');
+  const dataStructure = ['uint256, address, address'];
 
   let governanceNonce = await hre.ethers.provider.getTransactionCount(governance.address);
 
@@ -29,10 +30,13 @@ task('create-profile', 'creates a profile').setAction(async ({}, hre) => {
   console.log('  Follow Module Addr:', moduleAddr);
   console.log('  Profile Id', profileId);
 
+  const abiCoder = hre.ethers.utils.defaultAbiCoder;
+  const data = abiCoder.encode(dataStructure, [[amountToBePaid, currencyAddr, user.address]]);
+
   await waitForTx(
     lensHub
       .connect(user)
-      .setFollowModule(profileId, moduleAddr, [amountToBePaid, currencyAddr, user.address])
+      .setFollowModule(profileId, moduleAddr, data)
   ); // amount, currency, to
 
   console.log('Now the follow module is ', await lensHub.getFollowModule(profileId));
