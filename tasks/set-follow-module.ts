@@ -13,7 +13,7 @@ task('create-profile', 'creates a profile').setAction(async ({}, hre) => {
   const profileId = 1;
   const amountToBePaid = 1e17;
   const moduleAddr = addrs('backer follow module');
-  const dataStructure = ['uint256, address, address'];
+  const dataStructure = ['uint256', 'address', 'address'];
 
   let governanceNonce = await hre.ethers.provider.getTransactionCount(governance.address);
 
