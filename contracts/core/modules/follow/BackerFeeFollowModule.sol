@@ -76,7 +76,7 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
     }
 
     function createDistributor(uint256 profileId) external onlyHub {
-        require(_dataByProfile[profileId].fansToken == address(0), 'distributor-has-been-created');
+        require(_dataByProfile[profileId].distributor == address(0), 'distributor-has-been-created');
         _dataByProfile[profileId].distributor = address(0x01);
     }
 
