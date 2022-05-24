@@ -17,21 +17,21 @@ task('deploy-follow-module-and-whitelist', 'deploy a new follow module and white
   
   const addrs = getAddrs();
   // const backerFollowModuleAddr = addrs['backer fee follow module'];
-  const moduleGlobals = addrs['module globals'];
   const lensHub = LensHub__factory.connect(addrs['lensHub proxy'], governance);
+  const moduleGlobalsAddress = addrs['module globals'];
 
   let deployerNonce = await ethers.provider.getTransactionCount(deployer.address);
 
   console.log('\n\t-- Deploying Backer Fee Follow Module --');
   const backerFeeFollowModule = await deployWithVerify(
-    new BackerFeeFollowModule__factory(deployer).deploy(lensHub.address, moduleGlobals.address, {
+    new BackerFeeFollowModule__factory(deployer).deploy(lensHub.address, moduleGlobalsAddress, {
       nonce: deployerNonce++,
     }),
-    [lensHub.address, moduleGlobals.address],
+    [lensHub.address, moduleGlobalsAddress],
     'contracts/core/modules/follow/BackerFeeFollowModule.sol:BackerFeeFollowModule'
   );
 
   console.log('\n\t-- Whitelisting Follow Modules --');
   await waitForTx(lensHub.connect(governance).whitelistFollowModule(backerFeeFollowModule.address, true));
-  
+
 });
