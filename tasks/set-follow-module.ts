@@ -1,6 +1,5 @@
 import { task } from 'hardhat/config';
 import { LensHub__factory, ModuleGlobals__factory } from '../typechain-types';
-import { CreateProfileDataStruct } from '../typechain-types/LensHub';
 import { waitForTx, initEnv, getAddrs, ZERO_ADDRESS } from './helpers/utils';
 
 task('create-profile', 'creates a profile').setAction(async ({}, hre) => {
