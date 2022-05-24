@@ -2,7 +2,7 @@ import { task } from 'hardhat/config';
 import { LensHub__factory, ModuleGlobals__factory } from '../typechain-types';
 import { waitForTx, initEnv, getAddrs, ZERO_ADDRESS } from './helpers/utils';
 
-task('create-profile', 'creates a profile').setAction(async ({}, hre) => {
+task('set-follow-module', 'set a follow module for a profile').setAction(async ({}, hre) => {
   const [governance, , user] = await initEnv(hre);
   const addrs = getAddrs();
   const lensHub = LensHub__factory.connect(addrs['lensHub proxy'], governance);
@@ -30,7 +30,7 @@ task('create-profile', 'creates a profile').setAction(async ({}, hre) => {
   console.log('  Profile Id', profileId);
 
   const abiCoder = hre.ethers.utils.defaultAbiCoder;
-  const data = abiCoder.encode(dataStructure, [[amountToBePaid, currencyAddr, user.address]]);
+  const data = abiCoder.encode(dataStructure, [amountToBePaid, currencyAddr, user.address]);
 
   await waitForTx(
     lensHub
