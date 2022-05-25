@@ -2,17 +2,21 @@ import { task } from 'hardhat/config';
 import { LensHub__factory, FollowNFT__factory } from '../typechain-types';
 import { getAddrs, initEnv, waitForTx } from './helpers/utils';
 
-task('follow', 'follows a profile').setAction(async ({}, hre) => {
+task('follow-back', 'follows a profile with back module').setAction(async ({}, hre) => {
   const [, , user] = await initEnv(hre);
   const addrs = getAddrs();
   const lensHub = LensHub__factory.connect(addrs['lensHub proxy'], user);
   const abiCoder = hre.ethers.utils.defaultAbiCoder;
+  
+  
+  // assemble the data, it should be matched with the data when set the module
   const dataStructure = ['address', 'uint256'];
   const currencyAddr = '0xfe4F5145f6e09952a5ba9e956ED0C25e3Fa4c7F1';
   const amount = hre.ethers.BigNumber.from(10).pow(18);
   const data = abiCoder.encode(dataStructure, [currencyAddr, amount]);
 
   await waitForTx(lensHub.follow([1], [data]));
+  console.log('followed');
 
   const followNFTAddr = await lensHub.getFollowNFT(1);
   const followNFT = FollowNFT__factory.connect(followNFTAddr, user);
