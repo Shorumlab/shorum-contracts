@@ -7,7 +7,8 @@ It forks from lens protocol and extended the following functions:
 1. added back follow module which allows the user to pay to back a profile
 2. added nft collection as a type of publication
 3. allows the user to collect the nft collection and receive a portion of fees
-4. etc...
+4. added more tasks to make it more easy to use
+5. etc...
 
 ## Setup
 
