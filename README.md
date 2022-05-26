@@ -1,5 +1,14 @@
 # Shorum Contracts
 
+Shorum Protocol is a nft marketplace driven by web3 social graph.
+
+It forks from lens protocol and extended the following functions:
+
+1. added back follow module which allows the user to pay to back a profile
+2. added nft collection as a type of publication
+3. allows the user to collect the nft collection and receive a portion of fees
+4. etc...
+
 ## Setup
 
 > For now only Linux and macOS are known to work
