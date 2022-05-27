@@ -20,9 +20,11 @@ interface IWETH {
 contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
+
+    address followModule;
     // binded profile id
     uint256 profileId;
-    address followNFT;
+    // address followNFT;
     address payable public immutable WETH = payable(0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa);
 
     struct RewardData {
@@ -42,9 +44,22 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
     mapping(address => mapping(address => uint256)) public userRewardPerTokenEarned;
 
-    constructor(uint256 _profileId, address _followNFT) {
+    // constructor(uint256 _profileId, address _followNFT) {
+    //     profileId = _profileId;
+    //     followNFT = _followNFT;
+    //     totalRegistered = 0;
+    // }
+    
+    
+    constructor() public {
+        followModule = msg.sender;
+    }
+
+    // called once by the factory at time of deployment
+    function initialize(uint256 _profileId) external {
+        require(msg.sender == followModule, 'FollowRewardsDistributor: FORBIDDEN'); // sufficient check
         profileId = _profileId;
-        followNFT = _followNFT;
+        // followNFT = _followNFT;
         totalRegistered = 0;
     }
 

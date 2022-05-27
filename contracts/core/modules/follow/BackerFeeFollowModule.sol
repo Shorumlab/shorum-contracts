@@ -11,7 +11,7 @@ import {FollowValidatorFollowModuleBase} from './FollowValidatorFollowModuleBase
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
-
+import '../../FollowerRewardsDistributor.sol';
 /**
  * @notice A struct containing the necessary data to execute follow actions on a given profile.
  *
@@ -26,7 +26,14 @@ struct ProfileData {
     address distributor;
 }
 
-// Back a profile means using a small fund to support the Folowee and believe it's taste. 
+pragma solidity >=0.5.0;
+
+interface IFollowerRewardsDistributor {
+    function initialize(uint256) external;
+}
+
+
+// Back a profile means using a small fund to support the Folowee and trust its taste. 
 // Every time the profile profit from the nft treading, the folowee will get interest distributed
 // 
 // 
@@ -41,6 +48,7 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
     using SafeERC20 for IERC20;
 
     mapping(uint256 => ProfileData) internal _dataByProfile;
+    address[] public allDistributors;
 
     constructor(address hub, address moduleGlobals) FeeModuleBase(moduleGlobals) ModuleBase(hub) {}
 
@@ -75,9 +83,20 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         return data;
     }
 
-    function createDistributor(uint256 profileId) external onlyHub {
+    function createDistributor(uint256 profileId) external onlyHub returns (address distributor) {
         require(_dataByProfile[profileId].distributor == address(0), 'distributor-has-been-created');
-        _dataByProfile[profileId].distributor = address(0x01);
+        // create distributor contract and bind it to the user
+        // _dataByProfile[profileId].distributor = address(0x01);
+        bytes memory bytecode = type(FollowerRewardsDistributor).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(profileId));
+        assembly {
+            distributor := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+        // init distributor
+        IFollowerRewardsDistributor(distributor).initialize(profileId);
+        _dataByProfile[profileId].distributor = distributor;
+        allDistributors.push(distributor);
+        emit DistributorCreated(profileId, distributor, allDistributors.length);
     }
 
     /**
@@ -89,6 +108,7 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         uint256 profileId,
         bytes calldata data
     ) external override onlyHub {
+        require(_dataByProfile[profileId].distributor != address(0), 'distributor-not-created');
         uint256 amount = _dataByProfile[profileId].amount;
         address currency = _dataByProfile[profileId].currency;
         _validateDataIsExpected(data, currency, amount);
@@ -125,4 +145,7 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
     function getProfileData(uint256 profileId) external view returns (ProfileData memory) {
         return _dataByProfile[profileId];
     }
+
+    event DistributorCreated(uint256, address, uint256);
+
 }
