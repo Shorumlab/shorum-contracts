@@ -7,7 +7,7 @@ import {
 } from '../typechain-types';
 import { getAddrs, initEnv, waitForTx } from './helpers/utils';
 
-task('create-distributor-for-profile', 'create a distributor for a profile id').setAction(
+task('distribute-interest', 'create a distributor for a profile id').setAction(
   async ({}, hre) => {
     const [, , user] = await initEnv(hre);
     const addrs = getAddrs();
@@ -24,7 +24,7 @@ task('create-distributor-for-profile', 'create a distributor for a profile id').
     await waitForTx(distributorContract.addReward(wethAddr, 0));
     console.log('reward added');
 
-    
+
 
     await waitForTx(backerModule.createDistributor(profileId));
     console.log('distributor created');
