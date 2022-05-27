@@ -30,6 +30,7 @@ pragma solidity >=0.5.0;
 
 interface IFollowerRewardsDistributor {
     function initialize(uint256) external;
+    function register(address, uint256) external;
 }
 
 
