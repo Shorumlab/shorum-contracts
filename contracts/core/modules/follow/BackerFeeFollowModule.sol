@@ -83,7 +83,9 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         return data;
     }
 
-    function createDistributor(uint256 profileId) external onlyHub returns (address distributor) {
+    function createDistributor(uint256 profileId) external returns (address distributor) {
+        // Todo:: verify identity
+
         require(_dataByProfile[profileId].distributor == address(0), 'distributor-has-been-created');
         // create distributor contract and bind it to the user
         // _dataByProfile[profileId].distributor = address(0x01);
@@ -108,7 +110,6 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         uint256 profileId,
         bytes calldata data
     ) external override onlyHub {
-        require(_dataByProfile[profileId].distributor != address(0), 'distributor-not-created');
         uint256 amount = _dataByProfile[profileId].amount;
         address currency = _dataByProfile[profileId].currency;
         _validateDataIsExpected(data, currency, amount);
@@ -122,6 +123,11 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         if (treasuryAmount > 0) {
             IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
         }
+
+        // Register in distributor
+        address distributor = _dataByProfile[profileId].distributor;
+        require(distributor != address(0), 'distributor-not-created');
+        IFollowerRewardsDistributor(distributor).register(follower, profileId); // Todo:: check token id
     }
 
     /**
