@@ -10,6 +10,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
+interface IWETH {
+    function deposit() external payable;
+    function transfer(address to, uint value) external returns (bool);
+    function withdraw(uint) external;
+    function balanceOf(address) external returns(uint);
+}
 
 contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     using SafeMath for uint256;
@@ -17,16 +23,16 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     // binded profile id
     uint256 profileId;
     address followNFT;
+    address payable public immutable WETH = payable(0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa);
 
     struct RewardData {
-        address rewardsDistributor;
         uint256 rewardsDuration;
         uint256 periodFinish;
         uint256 rewardRate;
         uint256 lastUpdateTime;
         uint256 rewardPerNFTStored;
     }
-
+    mapping(address => bool) isRewardsDistributor;
     mapping(address => RewardData) rewardData; // rewardToken => rewardData
     address[] public rewardTokens;
     uint256 totalRegistered;
@@ -42,26 +48,12 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
         totalRegistered = 0;
     }
 
-    function addReward(address _rewardToken, address _rewardsDistributor, uint256 _rewardsDuration) external onlyOwner {
-        require(rewardData[_rewardToken].rewardsDuration == 0);
-        rewardTokens.push(_rewardToken);
-        rewardData[_rewardToken].rewardsDistributor = _rewardsDistributor;
-        rewardData[_rewardToken].rewardsDuration = _rewardsDuration;
-        rewardData[_rewardToken].rewardPerNFTStored = 0;
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 
-    function setRewardsDistributor(address _rewardToken, address _rewardsDistributor) external onlyOwner {
-        rewardData[_rewardToken].rewardsDistributor = _rewardsDistributor;
-    }
-
-    // function totalRegistered() external view returns (uint256) {
-    //     return totalRegistered;
-    // }
-
-    // function registeredOf(address account) external view returns (uint256) {
-    //     return userRegisteredAmount[account];
-    // }
-
+    /* ========== VIEW ONLY ========== */
+    
     function getRewardPerNFTEarned(address _rewardToken) public view returns (uint256) {
         if (totalRegistered == 0) {
             return rewardData[_rewardToken].rewardPerNFTStored;
@@ -71,6 +63,27 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
                 lastTimeRewardApplicable(_rewardToken).sub(rewardData[_rewardToken].lastUpdateTime).mul(rewardData[_rewardToken].rewardRate).mul(1e18).div(totalRegistered)
             );
     }
+
+    function rewardPerToken(address _rewardsToken) public view returns (uint256) {
+        if (totalRegistered == 0) {
+            return rewardData[_rewardsToken].rewardPerNFTStored;
+        }
+        return
+            rewardData[_rewardsToken].rewardPerNFTStored.add(
+                lastTimeRewardApplicable(_rewardsToken).sub(rewardData[_rewardsToken].lastUpdateTime).mul(rewardData[_rewardsToken].rewardRate).mul(1e18).div(totalRegistered)
+            );
+    }
+
+    function earned(address account, address _rewardsToken) public view returns (uint256) {
+        return userRegisteredAmount[account].mul(rewardPerToken(_rewardsToken).sub(userRewardPerTokenPaid[account][_rewardsToken])).div(1e18).add(userRewardPerTokenEarned[account][_rewardsToken]);
+    }
+
+    function lastTimeRewardApplicable(address _rewardsToken) public view returns (uint256) {
+        return Math.min(block.timestamp, rewardData[_rewardsToken].periodFinish);
+    }
+
+    /* ========== WRITE ONLY ========== */
+    
 
     // should be invoked when the followNFT is minted
     function register(address _user, uint256 _tokenId) external nonReentrant updateReward(_user) {
@@ -114,12 +127,10 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
         }
     }
 
-    function notifyRewardAmount(address _rewardsToken, uint256 reward) external updateReward(address(0)) {
+    function notifyRewardAmount(address _rewardsToken, uint256 reward) public updateReward(address(0)) {
 
-        // 
         // rewardData[rewardToken]
-        // Todo:: only allow whitelist to prevent attack
-        // require(rewardData[_rewardsToken].rewardsDistributor == msg.sender);
+        require(isRewardsDistributor[msg.sender] == true);
         // handle the transfer of reward tokens via `transferFrom` to reduce the number
         // of transactions required and ensure correctness of the reward amount
         IERC20(_rewardsToken).safeTransferFrom(msg.sender, address(this), reward);
@@ -137,35 +148,46 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
         // emit RewardAdded(reward);
     }
 
-    function setRewardsDuration(address _rewardsToken, uint256 _rewardsDuration) external {
+    /* ========== OWNER ONLY ========== */
+    function addReward(address _rewardToken, uint256 _rewardsDuration) external onlyOwner {
+        require(rewardData[_rewardToken].rewardsDuration == 0);
+        rewardTokens.push(_rewardToken);
+        rewardData[_rewardToken].rewardsDuration = _rewardsDuration;
+        rewardData[_rewardToken].rewardPerNFTStored = 0;
+    }
+
+    function setRewardsDistributor(address _rewardsDistributor, bool isTrue) external onlyOwner {
+        isRewardsDistributor[_rewardsDistributor] = isTrue;
+    }
+
+    // function totalRegistered() external view returns (uint256) {
+    //     return totalRegistered;
+    // }
+
+    // function registeredOf(address account) external view returns (uint256) {
+    //     return userRegisteredAmount[account];
+    // }
+    
+    function setRewardsDuration(address _rewardsToken, uint256 _rewardsDuration) external onlyOwner {
         require(
             block.timestamp > rewardData[_rewardsToken].periodFinish,
             "Reward period still active"
         );
-        require(rewardData[_rewardsToken].rewardsDistributor == msg.sender);
+        // require(isRewardsDistributor[msg.sender] == true);
         require(_rewardsDuration > 0, "Reward duration must be non-zero");
         rewardData[_rewardsToken].rewardsDuration = _rewardsDuration;
         // emit RewardsDurationUpdated(_rewardsToken, rewardData[_rewardsToken].rewardsDuration);
     }
 
-    function rewardPerToken(address _rewardsToken) public view returns (uint256) {
-        if (totalRegistered == 0) {
-            return rewardData[_rewardsToken].rewardPerNFTStored;
-        }
-        return
-            rewardData[_rewardsToken].rewardPerNFTStored.add(
-                lastTimeRewardApplicable(_rewardsToken).sub(rewardData[_rewardsToken].lastUpdateTime).mul(rewardData[_rewardsToken].rewardRate).mul(1e18).div(totalRegistered)
-            );
+    function syncETHRewards() external onlyOwner {
+        // wrap eth
+        uint256 _balance = address(this).balance;
+        IWETH(WETH).deposit{value: _balance}();
+        // notify and distribute eth
+        notifyRewardAmount(WETH, _balance);
     }
 
-    function earned(address account, address _rewardsToken) public view returns (uint256) {
-        return userRegisteredAmount[account].mul(rewardPerToken(_rewardsToken).sub(userRewardPerTokenPaid[account][_rewardsToken])).div(1e18).add(userRewardPerTokenEarned[account][_rewardsToken]);
-    }
-
-    function lastTimeRewardApplicable(address _rewardsToken) public view returns (uint256) {
-        return Math.min(block.timestamp, rewardData[_rewardsToken].periodFinish);
-    }
-
+    
     /* ========== MODIFIERS ========== */
     modifier updateReward(address account) {
         for (uint i; i < rewardTokens.length; i++) {
@@ -182,5 +204,5 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     
     /* ========== EVENTS ========== */
 
-    
+    event Received(address, uint);
 }
