@@ -2,7 +2,7 @@
 
 Shorum Protocol is a nft marketplace driven by web3 social graph.
 
-It forks from lens protocol and extended the following functions:
+It forks from `lens protocol` and extended the following functions:
 
 1. added back follow module which allows the user to pay to back a profile
 2. added distributor contract factory to allow the user to createa a distributor contract to distribute the funds to followers as rewards.
