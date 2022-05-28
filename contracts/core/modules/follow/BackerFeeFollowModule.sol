@@ -81,11 +81,11 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         _dataByProfile[profileId].currency = currency;
         _dataByProfile[profileId].recipient = recipient;
         _dataByProfile[profileId].distributor = address(0);
-        createDistributor();
+        createDistributor(profileId);
         return data;
     }
 
-    function createDistributor(uint256 profileId) external returns (address distributor) {
+    function createDistributor(uint256 profileId) public returns (address distributor) {
         // Todo:: verify identity
 
         require(
