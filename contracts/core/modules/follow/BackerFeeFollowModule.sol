@@ -30,14 +30,14 @@ pragma solidity >=0.5.0;
 
 interface IFollowerRewardsDistributor {
     function initialize(uint256) external;
+
     function register(address, uint256) external;
 }
 
-
-// Back a profile means using a small fund to support the Folowee and trust its taste. 
+// Back a profile means using a small fund to support the Folowee and trust its taste.
 // Every time the profile profit from the nft treading, the folowee will get interest distributed
-// 
-// 
+//
+//
 /**
  * @title BackerFeeFollowModule
  * @author Starit
@@ -74,20 +74,24 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
             data,
             (uint256, address, address)
         );
-        if (!_currencyWhitelisted(currency) || recipient == address(0) || amount == 0)
+        if (!_currencyWhitelisted(currency) || recipient == address(0))
             revert Errors.InitParamsInvalid();
 
         _dataByProfile[profileId].amount = amount;
         _dataByProfile[profileId].currency = currency;
         _dataByProfile[profileId].recipient = recipient;
         _dataByProfile[profileId].distributor = address(0);
+        createDistributor();
         return data;
     }
 
     function createDistributor(uint256 profileId) external returns (address distributor) {
         // Todo:: verify identity
 
-        require(_dataByProfile[profileId].distributor == address(0), 'distributor-has-been-created');
+        require(
+            _dataByProfile[profileId].distributor == address(0),
+            'distributor-has-been-created'
+        );
         // create distributor contract and bind it to the user
         // _dataByProfile[profileId].distributor = address(0x01);
         bytes memory bytecode = type(FollowerRewardsDistributor).creationCode;
@@ -100,6 +104,36 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         _dataByProfile[profileId].distributor = distributor;
         allDistributors.push(distributor);
         emit DistributorCreated(profileId, distributor, allDistributors.length);
+    }
+
+    /**
+     * @dev Inviate an address and directly follow
+     * This is to allow user to promote their account
+     * Limitation should be added in the future
+     */
+    function invite(address[] calldata inviteAddresses, uint256 profileId) external {
+        // Todo:: verify profile id auth
+        for (uint256 i; i < inviteAddresses.length; i++) {
+            // processFollow(inviteAddresses[i], profileId, data);
+            address follower = inviteAddresses[i];
+            uint256 amount = _dataByProfile[profileId].amount;
+            address currency = _dataByProfile[profileId].currency;
+
+            (address treasury, uint16 treasuryFee) = _treasuryData();
+            address recipient = _dataByProfile[profileId].recipient;
+            uint256 treasuryAmount = (amount * treasuryFee) / BPS_MAX;
+            uint256 adjustedAmount = amount - treasuryAmount;
+
+            IERC20(currency).safeTransferFrom(follower, recipient, adjustedAmount);
+            if (treasuryAmount > 0) {
+                IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
+            }
+
+            // Register in distributor
+            address distributor = _dataByProfile[profileId].distributor;
+            require(distributor != address(0), 'distributor-not-created');
+            IFollowerRewardsDistributor(distributor).register(follower, profileId); // Todo:: check token id
+        }
     }
 
     /**
@@ -154,5 +188,4 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
     }
 
     event DistributorCreated(uint256, address, uint256);
-
 }
