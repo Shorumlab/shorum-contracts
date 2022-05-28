@@ -25,7 +25,7 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     // binded profile id
     uint256 profileId;
     // address followNFT;
-    address payable public immutable WETH = payable(0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa);
+    address payable public immutable WETH = payable(0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889);
 
     struct RewardData {
         uint256 rewardsDuration;
