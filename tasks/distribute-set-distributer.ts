@@ -13,7 +13,7 @@ task('distribute-send-weth', 'send weth to distributor contract and wait for dis
     const [, , user] = await initEnv(hre);
     const addrs = getAddrs();
     const lensHub = LensHub__factory.connect(addrs['lensHub proxy'], user);
-    const backerModule = BackerFeeFollowModule__factory.connect(addrs['back follow module'], user);
+    const backerModule = BackerFeeFollowModule__factory.connect(addrs['backer follow module'], user);
 
     const profileId = 1;
 

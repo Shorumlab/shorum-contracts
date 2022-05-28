@@ -5,6 +5,7 @@ import {
   FollowerRewardsDistributor__factory,
   FollowNFT__factory,
   ERC20__factory,
+  IWETH__factory,
 } from '../typechain-types';
 import { getAddrs, initEnv, waitForTx } from './helpers/utils';
 
@@ -13,7 +14,7 @@ task('distribute-send-weth', 'send weth to distributor contract and wait for dis
     const [, , user] = await initEnv(hre);
     const addrs = getAddrs();
     const lensHub = LensHub__factory.connect(addrs['lensHub proxy'], user);
-    const backerModule = BackerFeeFollowModule__factory.connect(addrs['back follow module'], user);
+    const backerModule = BackerFeeFollowModule__factory.connect(addrs['backer follow module'], user);
 
     const profileId = 1;
 
@@ -28,6 +29,6 @@ task('distribute-send-weth', 'send weth to distributor contract and wait for dis
     const one = hre.ethers.BigNumber.from(10).pow(18)
     await waitForTx(distributorContract.notifyRewardAmount(wethAddr, one));
     console.log('reward notified: 1 weth');
-    
+
   }
 );
