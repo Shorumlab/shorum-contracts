@@ -37,7 +37,7 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     mapping(address => bool) isRewardsDistributor;
     mapping(address => RewardData) rewardData; // rewardToken => rewardData
     address[] public rewardTokens;
-    uint256 totalRegistered;
+    uint256 public totalRegistered;
     
     mapping(address => uint256) userRegisteredAmount; // user address => user registered nft amount
     
