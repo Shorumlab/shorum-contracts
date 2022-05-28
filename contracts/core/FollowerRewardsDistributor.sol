@@ -44,13 +44,6 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     
     mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
     mapping(address => mapping(address => uint256)) public userRewardPerTokenEarned;
-
-    // constructor(uint256 _profileId, address _followNFT) {
-    //     profileId = _profileId;
-    //     followNFT = _followNFT;
-    //     totalRegistered = 0;
-    // }
-    
     
     constructor() public {
         followModule = msg.sender;
@@ -66,6 +59,7 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
 
     receive() external payable {
         emit Received(msg.sender, msg.value);
+        syncRewards();
     }
 
     /* ========== VIEW ONLY ========== */
@@ -164,6 +158,28 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
         // emit RewardAdded(reward);
     }
 
+    /***
+     * This is to be used by receive()
+     */
+    function _notifyLocalRewardAmount(address _rewardsToken, uint256 reward) internal updateReward(address(0)) {
+
+        // rewardData[rewardToken]
+        // handle the transfer of reward tokens via `transferFrom` to reduce the number
+        // of transactions required and ensure correctness of the reward amount
+
+        if (block.timestamp >= rewardData[_rewardsToken].periodFinish) {
+            rewardData[_rewardsToken].rewardRate = reward.div(rewardData[_rewardsToken].rewardsDuration);
+        } else {
+            uint256 remaining = rewardData[_rewardsToken].periodFinish.sub(block.timestamp);
+            uint256 leftover = remaining.mul(rewardData[_rewardsToken].rewardRate);
+            rewardData[_rewardsToken].rewardRate = reward.add(leftover).div(rewardData[_rewardsToken].rewardsDuration);
+        }
+        
+        rewardData[_rewardsToken].lastUpdateTime = block.timestamp;
+        rewardData[_rewardsToken].periodFinish = block.timestamp.add(rewardData[_rewardsToken].rewardsDuration);
+        // emit RewardAdded(reward);
+    }
+
     /* ========== OWNER ONLY ========== */
     // Todo:: add onlyOwner
     function addReward(address _rewardToken, uint256 _rewardsDuration) external {
@@ -199,12 +215,12 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     }
 
     // Todo:: add onlyOwner
-    function syncETHRewards() external {
+    function syncRewards() public {
         // wrap eth
         uint256 _balance = address(this).balance;
         IWETH(WETH).deposit{value: _balance}();
         // notify and distribute eth
-        notifyRewardAmount(WETH, _balance);
+        _notifyLocalRewardAmount(WETH, _balance);
     }
 
     
