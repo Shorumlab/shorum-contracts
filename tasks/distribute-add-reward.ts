@@ -19,7 +19,7 @@ task('add-reward', 'add reward').setAction(
     const distributorAddr = await (await backerModule.getProfileData(profileId)).distributor;
     console.log('distributor address of profile id', profileId, 'is', distributorAddr);
 
-    const wethAddr = '0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa';
+    const wethAddr = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889';
     const distributorContract = FollowerRewardsDistributor__factory.connect(distributorAddr, user);
     await waitForTx(distributorContract.addReward(wethAddr, 0));
     console.log('reward added');

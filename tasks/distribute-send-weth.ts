@@ -21,7 +21,7 @@ task('distribute-send-weth', 'send weth to distributor contract and wait for dis
     const distributorAddr = await (await backerModule.getProfileData(profileId)).distributor;
     console.log('distributor address of profile id', profileId, 'is', distributorAddr);
 
-    const wethAddr = '0xA6FA4fB5f76172d178d61B04b0ecd319C5d1C0aa';
+    const wethAddr = '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889';
     // const weth = ERC20__factory.connect(wethAddr, user);
     // await waitForTx(weth.transfer(distributorAddr, hre.ethers.BigNumber.from(10).pow(18)));
 
