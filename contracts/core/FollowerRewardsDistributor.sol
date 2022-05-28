@@ -37,6 +37,7 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     mapping(address => bool) isRewardsDistributor;
     mapping(address => RewardData) rewardData; // rewardToken => rewardData
     address[] public rewardTokens;
+
     uint256 public totalRegistered;
     
     mapping(address => uint256) userRegisteredAmount; // user address => user registered nft amount
@@ -164,14 +165,16 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     }
 
     /* ========== OWNER ONLY ========== */
-    function addReward(address _rewardToken, uint256 _rewardsDuration) external onlyOwner {
+    // Todo:: add onlyOwner
+    function addReward(address _rewardToken, uint256 _rewardsDuration) external {
         require(rewardData[_rewardToken].rewardsDuration == 0);
         rewardTokens.push(_rewardToken);
         rewardData[_rewardToken].rewardsDuration = _rewardsDuration;
         rewardData[_rewardToken].rewardPerNFTStored = 0;
     }
 
-    function setRewardsDistributor(address _rewardsDistributor, bool isTrue) external onlyOwner {
+    // Todo:: add onlyOwner
+    function setRewardsDistributor(address _rewardsDistributor, bool isTrue) external {
         isRewardsDistributor[_rewardsDistributor] = isTrue;
     }
 
@@ -183,7 +186,8 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     //     return userRegisteredAmount[account];
     // }
     
-    function setRewardsDuration(address _rewardsToken, uint256 _rewardsDuration) external onlyOwner {
+    // Todo:: add onlyOwner
+    function setRewardsDuration(address _rewardsToken, uint256 _rewardsDuration) external {
         require(
             block.timestamp > rewardData[_rewardsToken].periodFinish,
             "Reward period still active"
@@ -194,7 +198,8 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
         // emit RewardsDurationUpdated(_rewardsToken, rewardData[_rewardsToken].rewardsDuration);
     }
 
-    function syncETHRewards() external onlyOwner {
+    // Todo:: add onlyOwner
+    function syncETHRewards() external {
         // wrap eth
         uint256 _balance = address(this).balance;
         IWETH(WETH).deposit{value: _balance}();
