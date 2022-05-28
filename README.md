@@ -32,7 +32,7 @@ To deploy, please execute:
 
 * prepare `.env`
 * `npm i`
-* `npx hardhat full-deploy-verify --network mumbai`
+* `npx hardhat testnet-full-deploy-verify --network mumbai`
 
 ## Usage
 
@@ -60,8 +60,9 @@ Please replace the params and network to the target content before executing.
   
   `npx hardhat follow-back --network mumbai`
 
-
 - Set Distributor: set an whitelisted account to send the funds. This is to prevent attack.
+
+  `npx hardhat distribute-set-distributer --network mumbai`
 
 - Add Reward: add an allowed reward token
 
@@ -86,15 +87,9 @@ Deployed in mumbai for testing purpose.
   "lens periphery": "0xb3f17b6C7453AcDb4aC449AFE0a066C4dCC82f4b",
   "module globals": "0x5F044a4ACb91afaf6A1136C51d01318a75C01902",
   "fee collect module": "0xfD0f2192536Bc516eb5Ef5EAAc3073820e706b3b",
-  "limited fee collect module": "0x438414f0aeD30c7f27aa55D9F2802c85a92573e3",
-  "timed fee collect module": "0xa80f926Bdb67D69d758Bd66502fBe2E7E5AaEE26",
-  "limited timed fee collect module": "0xbBC99d06e1606CC65D69C95855bF7A69b483E0C0",
-  "revert collect module": "0xF35A8EfE3B84D9D381c1CF727F355A85eA0669B7",
   "free collect module": "0x99Fa14b225a9fC5AE22e1fEE04e8ED76725Fd762",
   "fee follow module": "0x5b172513DCf2c39cfC81c361768D82aEB127633E",
   "backer follow module": "0x49426760039C65a5d04FFA810454Cc14EfCB16Ee",
-  "profile follow module": "0xD866D717C62c3913d8B13D80Ba776223f1C64852",
-  "revert follow module": "0x9783B838D6FBC8175eE95329bA2bB1B6858B45D8",
   "follower only reference module": "0x4B04F55c5072c5109424aba622694781F4fE421a",
   "profile creation proxy": "0x58cBBcfdAD30B07d0FD70312980Aad43dE7B7010",
   "UI data provider": "0x17426a1695ad4aF79CF98102Aa063e4440d4Ca91"

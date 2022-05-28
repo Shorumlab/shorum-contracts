@@ -59,6 +59,10 @@ task(
   const governance = accounts[1];
   const treasuryAddress = accounts[2].address;
 
+  console.log('deployer', accounts[0])
+  console.log('governance', accounts[1])
+  console.log('treasuryAddress,', accounts[2].address)
+
   // Nonce management in case of deployment issues
   let deployerNonce = await ethers.provider.getTransactionCount(deployer.address);
 
@@ -282,32 +286,32 @@ task(
   // Whitelist the collect modules
   console.log('\n\t-- Whitelisting Collect Modules --');
   let governanceNonce = await ethers.provider.getTransactionCount(governance.address);
-  await waitForTx(
-    lensHub.whitelistCollectModule(feeCollectModule.address, true, { nonce: governanceNonce++ })
-  );
-  await waitForTx(
-    lensHub.whitelistCollectModule(limitedFeeCollectModule.address, true, {
-      nonce: governanceNonce++,
-    })
-  );
-  await waitForTx(
-    lensHub.whitelistCollectModule(timedFeeCollectModule.address, true, {
-      nonce: governanceNonce++,
-    })
-  );
-  await waitForTx(
-    lensHub.whitelistCollectModule(limitedTimedFeeCollectModule.address, true, {
-      nonce: governanceNonce++,
-    })
-  );
-  await waitForTx(
-    lensHub.whitelistCollectModule(revertCollectModule.address, true, {
-      nonce: governanceNonce++,
-    })
-  );
-  await waitForTx(
-    lensHub.whitelistCollectModule(freeCollectModule.address, true, { nonce: governanceNonce++ })
-  );
+  // await waitForTx(
+  //   lensHub.whitelistCollectModule(feeCollectModule.address, true, { nonce: governanceNonce++ })
+  // );
+  // await waitForTx(
+  //   lensHub.whitelistCollectModule(limitedFeeCollectModule.address, true, {
+  //     nonce: governanceNonce++,
+  //   })
+  // );
+  // await waitForTx(
+  //   lensHub.whitelistCollectModule(timedFeeCollectModule.address, true, {
+  //     nonce: governanceNonce++,
+  //   })
+  // );
+  // await waitForTx(
+  //   lensHub.whitelistCollectModule(limitedTimedFeeCollectModule.address, true, {
+  //     nonce: governanceNonce++,
+  //   })
+  // );
+  // await waitForTx(
+  //   lensHub.whitelistCollectModule(revertCollectModule.address, true, {
+  //     nonce: governanceNonce++,
+  //   })
+  // );
+  // await waitForTx(
+  //   lensHub.whitelistCollectModule(freeCollectModule.address, true, { nonce: governanceNonce++ })
+  // );
 
   // Whitelist the follow modules
   console.log('\n\t-- Whitelisting Follow Modules --');
@@ -317,9 +321,9 @@ task(
   await waitForTx(
     lensHub.whitelistFollowModule(profileFollowModule.address, true, { nonce: governanceNonce++ })
   );
-  await waitForTx(
-    lensHub.whitelistFollowModule(revertFollowModule.address, true, { nonce: governanceNonce++ })
-  );
+  // await waitForTx(
+  //   lensHub.whitelistFollowModule(revertFollowModule.address, true, { nonce: governanceNonce++ })
+  // );
   // --- COMMENTED OUT AS THIS IS NOT A LAUNCH MODULE ---
   // await waitForTx(
   // lensHub.whitelistFollowModule(approvalFollowModule.address, true, {
