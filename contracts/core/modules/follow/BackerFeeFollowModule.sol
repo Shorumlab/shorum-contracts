@@ -50,6 +50,7 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
 
     mapping(uint256 => ProfileData) internal _dataByProfile;
     address[] public allDistributors;
+    mapping(address => bool) invitedAddress; // invited address don't need to pay fees
 
     constructor(address hub, address moduleGlobals) FeeModuleBase(moduleGlobals) ModuleBase(hub) {}
 
@@ -111,28 +112,10 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
      * This is to allow user to promote their account
      * Limitation should be added in the future
      */
-    function invite(address[] calldata inviteAddresses, uint256 profileId) external {
+    function invite(address[] calldata _inviteAddresses, uint256 profileId) external {
         // Todo:: verify profile id auth
-        for (uint256 i; i < inviteAddresses.length; i++) {
-            // processFollow(inviteAddresses[i], profileId, data);
-            address follower = inviteAddresses[i];
-            uint256 amount = _dataByProfile[profileId].amount;
-            address currency = _dataByProfile[profileId].currency;
-
-            (address treasury, uint16 treasuryFee) = _treasuryData();
-            address recipient = _dataByProfile[profileId].recipient;
-            uint256 treasuryAmount = (amount * treasuryFee) / BPS_MAX;
-            uint256 adjustedAmount = amount - treasuryAmount;
-
-            IERC20(currency).safeTransferFrom(follower, recipient, adjustedAmount);
-            if (treasuryAmount > 0) {
-                IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
-            }
-
-            // Register in distributor
-            address distributor = _dataByProfile[profileId].distributor;
-            require(distributor != address(0), 'distributor-not-created');
-            IFollowerRewardsDistributor(distributor).register(follower, profileId); // Todo:: check token id
+        for (uint256 i = 0; i < _inviteAddresses.length; i++) {
+            invitedAddress[_inviteAddresses[i]] = true;
         }
     }
 
@@ -149,14 +132,16 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         address currency = _dataByProfile[profileId].currency;
         _validateDataIsExpected(data, currency, amount);
 
-        (address treasury, uint16 treasuryFee) = _treasuryData();
-        address recipient = _dataByProfile[profileId].recipient;
-        uint256 treasuryAmount = (amount * treasuryFee) / BPS_MAX;
-        uint256 adjustedAmount = amount - treasuryAmount;
+        if (invitedAddress[follower] != true) {
+            (address treasury, uint16 treasuryFee) = _treasuryData();
+            address recipient = _dataByProfile[profileId].recipient;
+            uint256 treasuryAmount = (amount * treasuryFee) / BPS_MAX;
+            uint256 adjustedAmount = amount - treasuryAmount;
 
-        IERC20(currency).safeTransferFrom(follower, recipient, adjustedAmount);
-        if (treasuryAmount > 0) {
-            IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
+            IERC20(currency).safeTransferFrom(follower, recipient, adjustedAmount);
+            if (treasuryAmount > 0) {
+                IERC20(currency).safeTransferFrom(follower, treasury, treasuryAmount);
+            }
         }
 
         // Register in distributor
