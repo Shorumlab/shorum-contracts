@@ -7,7 +7,10 @@ task('create-distributor-for-profile', 'create a distributor for a profile id').
     const [, , user] = await initEnv(hre);
     const addrs = getAddrs();
     const lensHub = LensHub__factory.connect(addrs['lensHub proxy'], user);
-    const backerModule = BackerFeeFollowModule__factory.connect(addrs['back follow module'], user);
+    const backerModule = BackerFeeFollowModule__factory.connect(
+      addrs['backer follow module'],
+      user
+    );
 
     const profileId = 1;
 
