@@ -89,7 +89,7 @@ Deployed in mumbai for testing purpose.
   "fee collect module": "0xfD0f2192536Bc516eb5Ef5EAAc3073820e706b3b",
   "free collect module": "0x99Fa14b225a9fC5AE22e1fEE04e8ED76725Fd762",
   "fee follow module": "0x5b172513DCf2c39cfC81c361768D82aEB127633E",
-  "backer follow module": "0x38d01a8E1d70404B1d25fd0E5ACbf95C672c0C4A",
+  "backer follow module": "0xf2613a453b266a67D02C81d8c920c64a90257206",
   "follower only reference module": "0x4B04F55c5072c5109424aba622694781F4fE421a",
   "profile creation proxy": "0x58cBBcfdAD30B07d0FD70312980Aad43dE7B7010",
   "UI data provider": "0x17426a1695ad4aF79CF98102Aa063e4440d4Ca91"
