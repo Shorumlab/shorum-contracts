@@ -21,9 +21,9 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    address followModule;
+    address public followModule;
     // binded profile id
-    uint256 profileId;
+    uint256 public profileId;
     // address followNFT;
     address payable public immutable WETH = payable(0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889);
 

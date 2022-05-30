@@ -30,8 +30,8 @@ import {
 import { deployWithVerify, waitForTx } from './helpers/utils';
 
 const TREASURY_FEE_BPS = 50;
-const LENS_HUB_NFT_NAME = 'Lens Protocol Profiles';
-const LENS_HUB_NFT_SYMBOL = 'LPP';
+const LENS_HUB_NFT_NAME = 'Spore Protocol Profiles';
+const LENS_HUB_NFT_SYMBOL = 'SPP';
 
 export let runtimeHRE: HardhatRuntimeEnvironment;
 
@@ -48,7 +48,7 @@ export let runtimeHRE: HardhatRuntimeEnvironment;
  */
 task(
   'testnet-full-deploy-verify',
-  'deploys the entire Lens Protocol with explorer verification (testnet)'
+  'deploys the entire Spore Protocol with explorer verification (testnet)'
 ).setAction(async ({}, hre) => {
   // Note that the use of these signers is a placeholder and is not meant to be used in
   // production.
@@ -59,9 +59,9 @@ task(
   const governance = accounts[1];
   const treasuryAddress = accounts[2].address;
 
-  console.log('deployer', accounts[0])
-  console.log('governance', accounts[1])
-  console.log('treasuryAddress,', accounts[2].address)
+  console.log('deployer', accounts[0]);
+  console.log('governance', accounts[1]);
+  console.log('treasuryAddress,', accounts[2].address);
 
   // Nonce management in case of deployment issues
   let deployerNonce = await ethers.provider.getTransactionCount(deployer.address);
