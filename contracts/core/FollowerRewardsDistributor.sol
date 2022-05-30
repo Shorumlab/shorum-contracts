@@ -25,7 +25,9 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     // binded profile id
     uint256 public profileId;
     // address followNFT;
-    address payable public immutable WETH = payable(0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889);
+    // address payable public immutable WETH = payable(0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889);  // mumbai testnet
+    address payable public immutable WETH = payable(0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270);     // polygon mainnet
+
 
     struct RewardData {
         uint256 rewardsDuration;
@@ -40,7 +42,7 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
 
     uint256 public totalRegistered;
     
-    mapping(address => uint256) userRegisteredAmount; // user address => user registered nft amount
+    mapping(address => uint256) public userRegisteredAmount; // user address => user registered nft amount
     
     mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
     mapping(address => mapping(address => uint256)) public userRewardPerTokenEarned;
@@ -140,7 +142,7 @@ contract FollowerRewardsDistributor is ReentrancyGuard, Ownable, Pausable {
     function notifyRewardAmount(address _rewardsToken, uint256 reward) public updateReward(address(0)) {
 
         // rewardData[rewardToken]
-        require(isRewardsDistributor[msg.sender] == true);
+        // require(isRewardsDistributor[msg.sender] == true);   Todo:: enable this line
         // handle the transfer of reward tokens via `transferFrom` to reduce the number
         // of transactions required and ensure correctness of the reward amount
         IERC20(_rewardsToken).safeTransferFrom(msg.sender, address(this), reward);

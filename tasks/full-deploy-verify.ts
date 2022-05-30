@@ -370,7 +370,7 @@ task(
     'module globals': moduleGlobals.address,
     'fee collect module': feeCollectModule.address,
     'fee follow module': feeFollowModule.address,
-    'backer follow module': backerFollowModule.address,
+    'backer follow module': backerFeeFollowModule.address,
     // --- COMMENTED OUT AS THIS IS NOT A LAUNCH MODULE ---
     // 'approval follow module': approvalFollowModule.address,
     'UI data provider': uiDataProvider.address,

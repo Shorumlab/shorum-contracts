@@ -32,6 +32,8 @@ interface IFollowerRewardsDistributor {
     function initialize(uint256) external;
 
     function register(address, uint256) external;
+
+    function addReward(address, uint256) external;
 }
 
 // Back a profile means using a small fund to support the Folowee and trust its taste.
@@ -105,6 +107,9 @@ contract BackerFeeFollowModule is FeeModuleBase, FollowValidatorFollowModuleBase
         _dataByProfile[profileId].distributor = distributor;
         allDistributors.push(distributor);
         emit DistributorCreated(profileId, distributor, allDistributors.length);
+
+        // Add default reward
+        IFollowerRewardsDistributor(distributor).addReward(address(0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270), 1);  // add wmatic as supported reward
     }
 
     /**
