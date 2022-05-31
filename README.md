@@ -96,6 +96,26 @@ Deployed in mumbai for testing purpose.
 }
 ```
 
+Deployed in polygon mainnet:
+
+```json
+{
+  "lensHub proxy": "0xf3Fce0c9C3120Ee3b5742f18Fcd0EdD9cF08228F",
+  "lensHub impl:": "0x97a7B1b231B9Dbb6686Fee6D94Bb69885e1fFD9F",
+  "publishing logic lib": "0xC72083E3e4Ee14afdd8A9049aA5235008227E4f6",
+  "interaction logic lib": "0x9D09aA57A5F34d19627594aF495C8edAE921F201",
+  "profile token URI logic lib": "0x569A3Efc003f624980AA7dB3cc164c8366D5172f",
+  "follow NFT impl": "0xd6581f2bc52b81139ea77a7cb371e37c64a13e5a",
+  "collect NFT impl": "0x7e19969bc6408819de5a703bb0622fe9e155c34c",
+  "lens periphery": "0xA60D8a5E653592383B373163665b5B85Ad99CD16",
+  "module globals": "0x7b94a15d76d870FB4AeA233E98f6367C5A4DAA2c",
+  "fee collect module": "0x86a4Cf08f5145458eC42b3933AB4C57e1AfC80f1",
+  "fee follow module": "0x05D2b432B2e7890d78ea7aC5EF7c6009b002C612",
+  "backer follow module": "0xE19122416BeeD4cbaDd663878de9af7c0eb32368",
+  "UI data provider": "0xE8E2F01A2b06e3483140110e683c6945010225aB",
+  "Profile creation proxy": "0xd2aD99FbB9835Ec17B546292b1c186866f6bfeb2"
+}
+```
 
 ## Frontend integration
 
@@ -119,3 +139,6 @@ write
 * lensHub
 * Backer Follow Module
 * Distributor
+
+
+
